@@ -155,13 +155,13 @@ function Content() {
         </ButtonItem>
       </PanelSectionRow>
       <PanelSectionRow>
-        <ButtonItem layout="below" onClick={on2160pDotClick}>
-          Make Crosshair Dot (2160p)
-        </ButtonItem>
-      </PanelSectionRow>
-            <PanelSectionRow>
         <ButtonItem layout="below" onClick={on2160pClick}>
           Make Crosshair Box (2160p)
+        </ButtonItem>
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <ButtonItem layout="below" onClick={on2160pDotClick}>
+          Make Crosshair Dot (2160p)
         </ButtonItem>
       </PanelSectionRow>
       <PanelSectionRow>
