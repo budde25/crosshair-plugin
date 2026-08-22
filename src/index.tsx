@@ -9,6 +9,8 @@ import { useState, useEffect } from "react";
 import { FaCrosshairs } from "react-icons/fa";
 
 // Existing Python methods
+const makeCrosshair = callable<[string], number[]>("make_crosshair");
+const getDisplayResolution = callable<[], number[]>("get_display_resolution");
 const make800pCrosshair = callable<[], void>("make_800p_crosshair");
 const make1080pCrosshair = callable<[], void>("make_1080p_crosshair");
 const make2160pCrosshair = callable<[], void>("make_2160p_crosshair");
@@ -23,6 +25,7 @@ function Content() {
   const [status, setStatus] = useState("No action yet");
   const [xOffset, setXOffset] = useState(0);
   const [yOffset, setYOffset] = useState(0);
+  const [resolution, setResolution] = useState<string>("Detecting...");
 
   const fetchOffsets = async () => {
     try {
@@ -31,6 +34,28 @@ function Content() {
       setYOffset(y);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const fetchResolution = async () => {
+    try {
+      const [width, height] = await getDisplayResolution();
+      setResolution(`${width}x${height}`);
+    } catch (error) {
+      console.error(error);
+      setResolution("Unknown");
+    }
+  };
+
+  const onAutoClick = async (style: "box" | "dot") => {
+    try {
+      const [width, height] = await makeCrosshair(style);
+      setResolution(`${width}x${height}`);
+      setStatus(`Crosshair ${style} applied for ${width}x${height}!`);
+      await fetchOffsets();
+    } catch (error) {
+      console.error(error);
+      setStatus(`Failed to apply ${style} crosshair.`);
     }
   };
 
@@ -56,7 +81,7 @@ function Content() {
     }
   };
 
-   const on2160pClick = async () => {
+  const on2160pClick = async () => {
     try {
       await make2160pCrosshair();
       setStatus("Crosshair Box for 2160p applied!");
@@ -125,14 +150,28 @@ function Content() {
 
   useEffect(() => {
     fetchOffsets();
+    fetchResolution();
   }, []);
 
   return (
     <PanelSection title="Crosshair Plugin">
       <PanelSectionRow>
         <div>
-          NOTE: This plugin works by replacing the performance overlay with text that acts as a crosshair in your game. Currently you can not have both a performance overlay and crosshairs at the same time. To restore performance overlay, simply toggle one of the 4 levels from the QAM tab. 
+          NOTE: This plugin works by replacing the performance overlay with text that acts as a crosshair in your game. Currently you can not have both a performance overlay and crosshairs at the same time. To restore performance overlay, simply toggle one of the 4 levels from the QAM tab.
         </div>
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <div>Detected display: {resolution}</div>
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <ButtonItem layout="below" onClick={() => onAutoClick("box")}>
+          Make Crosshair Box (Auto)
+        </ButtonItem>
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <ButtonItem layout="below" onClick={() => onAutoClick("dot")}>
+          Make Crosshair Dot (Auto)
+        </ButtonItem>
       </PanelSectionRow>
       <PanelSectionRow>
         <ButtonItem layout="below" onClick={on800pClick}>
